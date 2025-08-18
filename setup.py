@@ -1,7 +1,6 @@
 import os
 import subprocess
 import zipfile
-import getpass
 import webbrowser
 import json
 import sys
