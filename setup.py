@@ -49,7 +49,6 @@ def create_tfvars():
     print(f"✅ terraform.tfvars created at {tfvars_path}. (Remember: don't commit this!)")
 
 
-
 def run_terraform():
     print("[3/5] Initializing Terraform...")
 
@@ -79,12 +78,14 @@ def run_terraform():
 
 def open_website():
     print("[5/5] Fetching website URL...")
+    modules_dir = os.path.join(os.getcwd(), "modules")
     try:
         result = subprocess.run(
             ["terraform", "output", "-json"],
             capture_output=True,
             text=True,
-            check=True
+            check=True,
+            cwd=modules_dir
         )
         outputs = json.loads(result.stdout)
         possible_keys = ["website_url", "cloudfront_url", "site_url"]
@@ -101,10 +102,17 @@ def open_website():
     except subprocess.CalledProcessError:
         print("⚠️ Failed to get Terraform outputs.")
 
+
 def destroy_terraform():
     print("🛑 Destroying all Terraform-managed resources...")
-    subprocess.run(["terraform", "destroy", "-auto-approve"], check=True)
+    modules_dir = os.path.join(os.getcwd(), "modules")
+    subprocess.run(
+        ["terraform", "destroy", "-auto-approve"],
+        check=True,
+        cwd=modules_dir
+    )
     print("✅ All resources destroyed.")
+
 
 if __name__ == "__main__":
     try:
