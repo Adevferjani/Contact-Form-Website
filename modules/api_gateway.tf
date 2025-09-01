@@ -1,6 +1,6 @@
 # HTTP API Gateway configuration
 resource "aws_apigatewayv2_api" "contact_form_api" {
-  name          = "contact-form-api"
+  name         = "contact-form-api"
   protocol_type = "HTTP"
   description   = "Contact Form API Gateway"
   version       = "1.0"
@@ -62,7 +62,7 @@ resource "aws_apigatewayv2_stage" "default" {
 
 # CloudWatch Log Group for API Gateway
 resource "aws_cloudwatch_log_group" "api_gw" {
-  name              = "/aws/apigateway/${aws_apigatewayv2_api.contact_form_api.name}"
+  name_prefix              = "/aws/apigateway/${aws_apigatewayv2_api.contact_form_api.name}"
   retention_in_days = 7  # Log retention period
 }
 

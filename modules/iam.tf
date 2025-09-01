@@ -1,6 +1,6 @@
 # IAM Role for Lambda execution
 resource "aws_iam_role" "lambda_exec" {
-  name = "lambda-exec-role"
+  name_prefix = "lambda-exec-role-"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -22,7 +22,7 @@ resource "aws_iam_role_policy_attachment" "lambda_basic" {
 
 # Custom policy for DynamoDB write access
 resource "aws_iam_role_policy" "dynamodb_access" {
-  name = "dynamodb-access"
+  name_prefix = "dynamodb-access-"
   role = aws_iam_role.lambda_exec.id
 
   policy = jsonencode({
