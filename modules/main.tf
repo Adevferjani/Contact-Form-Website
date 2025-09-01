@@ -12,4 +12,7 @@ resource "aws_s3_object" "index_html" {
   key          = "index.html"
   content      = data.template_file.index_html.rendered
   content_type = "text/html"
+
+  # Ensure this runs after the OAI is created
+  depends_on = [aws_cloudfront_origin_access_identity.origin_access_identity]
 }

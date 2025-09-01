@@ -22,26 +22,38 @@ resource "aws_s3_bucket_public_access_block" "public_access" {
   bucket = aws_s3_bucket.website_bucket.id
 
   block_public_acls       = true
-  block_public_policy     = false  # Required for public website
+  block_public_policy     = true
   ignore_public_acls      = true
-  restrict_public_buckets = false
+  restrict_public_buckets = true
 }
 
-# Bucket policy allowing public read access
+# IAM policy document for CloudFront access only
+data "aws_iam_policy_document" "s3_policy" {
+  statement {
+    actions   = ["s3:GetObject"]
+    resources = ["${aws_s3_bucket.website_bucket.arn}/*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_cloudfront_origin_access_identity.origin_access_identity.iam_arn]
+    }
+  }
+
+  statement {
+    actions   = ["s3:ListBucket"]
+    resources = [aws_s3_bucket.website_bucket.arn]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_cloudfront_origin_access_identity.origin_access_identity.iam_arn]
+    }
+  }
+}
+
+# Bucket policy allowing only CloudFront access via OAI
 resource "aws_s3_bucket_policy" "bucket_policy" {
   bucket = aws_s3_bucket.website_bucket.id
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid       = "PublicReadGetObject"
-        Effect    = "Allow"
-        Principal = "*"
-        Action    = "s3:GetObject"
-        Resource  = "${aws_s3_bucket.website_bucket.arn}/*"
-      }
-    ]
-  })
+  policy = data.aws_iam_policy_document.s3_policy.json
 }
 
 # S3 Bucket for storing Lambda deployment package
